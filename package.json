@@ -8,7 +8,7 @@
     "webpack html favicon",
     "webpack favicons"
   ],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Webpack plugin to generate favicons for devices and browsers",
   "repository": "drolsen/webpack-favicons",
   "bugs": {
