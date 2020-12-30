@@ -7,19 +7,15 @@
 [![devDependencies Status](https://david-dm.org/drolsen/webpack-favicons/dev-status.svg)](https://david-dm.org/drolsen/webpack-favicons?type=dev)
 </div>
 
-## Does this plugin work with Webpack 5?
-Yes this works on webpack 5.10.0 and above, however does require a node version of 12.0.0 or higher.
+### Does this plugin work with Webpack 4?
+No, you should checkout https://github.com/jantimon/favicons-webpack-plugin for a Webpack4 compatible plugin.
 
-## Does this plugin work with Webpack 4?
-No, you should checkout https://github.com/jantimon/favicons-webpack-plugin for a Webpack4 compatiable plugin.
 
-## Does this plugin
-
-## How does it works
+### How does it works
 By tapping into the Webpack5's latest hook updates, WebackFavicon digs into the build to search for any instances of HTML file assets.
 While doing that, it leverages the favicon (https://github.com/itgalaxy/favicons) module to generate configured favicons off your provided source file.
 
-Once everything is done, you have device and browser specific generated favicons from a single source and any / all HTML files now have corrisponding link tags now injected.
+Once everything is done, you have device and browser specific generated favicons from a single source and any / all HTML files now have corresponding link tags now injected.
 
 ---
 ## Install
@@ -48,7 +44,7 @@ Recommended that your source favicon file be a SVG vector file. This allow for b
 
 
 
-## Plugin Options Configuration
+## Options
 
 Note: These options both come from, and are directly passed passed ot the favicon generating node module.
 For much more information about these options please visit: https://github.com/itgalaxy/favicons
@@ -63,7 +59,7 @@ Option | Type | Description
 `developerURL` | String | Your (or your developer's) URL.
 `dir` | String | Primary text direction for name, short_name, and description
 `lang` | String | Primary language for name and short_name
-`background` | String | Background colour for flattened icons.
+`background` | String | Background color for flattened icons.
 `theme_color` | String | Theme color user for example in Android's task switcher.
 `appleStatusBarStyle` | String | Style for Apple status bar: "black-translucent", "default", "black".
 `display` | String | Preferred display mode: "fullscreen", "standalone", "minimal-ui" or "browser".
@@ -76,7 +72,7 @@ Option | Type | Description
 `loadManifestWithCredentials` | Boolean | Browsers don't send cookies when fetching a manifest, enable this to fix that.
 `icons` | Object |
 
-## Plugin Icon Object Options
+## Icon Object's Options
 Option | Type | Description
 `android` | Boolean | Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 `appleIcon` | Boolean | Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
@@ -92,7 +88,7 @@ Option | Type | Description
 ### Tests
 
 Webpack Favicons comes with one `test`.
-These helps ensure that both favicons get written to disk and that link tags are injected into any HTML assets within the larger webpack build process.
+These helps ensure that both favicons get written to disk and that link tags are injected into any HTML assets within the larger Webpack build process.
 
 Simply run `npm run test` or `yarn test` from the root of the plugin to run test.
 
