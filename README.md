@@ -46,11 +46,12 @@ Recommended that your source favicon file be a SVG vector file. This allow for b
 
 ## Options
 
-Note: These options both come from, and are directly passed passed ot the favicon generating node module.
+Note: These options both come from, and are directly passed to the favicon generating node module.
 For much more information about these options please visit: https://github.com/itgalaxy/favicons
 
 Option | Type | Description
 --- | --- | ---
+`src` | String | Path to the source favicon file which all favicons will be generated from
 `path` | String | Path for overriding default icons path.
 `appName` | String | Your application's name.
 `appShortName` | String | Your application's short_name. (Optional. If not set, appName will be used)
@@ -70,9 +71,10 @@ Option | Type | Description
 `logging` | Boolean | Print logs to console?
 `pixel_art` | String | Keeps pixels "sharp" when scaling up, for pixel art.  Only supported in offline mode.
 `loadManifestWithCredentials` | Boolean | Browsers don't send cookies when fetching a manifest, enable this to fix that.
-`icons` | Object |
+`icons` | Object | See below for more details about this object's options.
 
 ## Icon Object's Options
+--- | --- | ---
 Option | Type | Description
 `android` | Boolean | Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 `appleIcon` | Boolean | Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
