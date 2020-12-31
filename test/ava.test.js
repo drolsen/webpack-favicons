@@ -11,6 +11,7 @@ test('write', t => {
 
   if (insert) {
     t.pass();
+    console.log('Successfully tested link tag insertion');
   } else {
     t.fail();
   }
@@ -18,12 +19,28 @@ test('write', t => {
 
 test('insert', t => {
   let hasFile = false;
-    if (fs.existsSync(path.resolve(__dirname, '../dist/favicon.ico'))){
+    if (fs.existsSync(path.resolve(__dirname, '../dist/assets/favicon.ico'))){
       hasFile = true;
     }
 
   if (hasFile) {
     t.pass();
+    console.log('Successfully tested for favicon files');
+  } else {
+    t.fail();
+  }
+});
+
+
+test('manifest', t => {
+  let hasFile = false;
+    if (fs.existsSync(path.resolve(__dirname, '../dist/assets/manifest.json'))){
+      hasFile = true;
+    }
+
+  if (hasFile) {
+    t.pass();
+    console.log('Successfully tested manifest files');
   } else {
     t.fail();
   }
