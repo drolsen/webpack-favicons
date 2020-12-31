@@ -74,8 +74,8 @@ Option | Type | Description
 `icons` | Object | See below for more details about this object's options.
 
 ## Icon Object's Options
---- | --- | ---
 Option | Type | Description
+--- | --- | ---
 `android` | Boolean | Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 `appleIcon` | Boolean | Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 `appleStartup` | Boolean | Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
