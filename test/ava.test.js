@@ -11,7 +11,6 @@ test('write', t => {
 
   if (insert) {
     t.pass();
-    console.log('Successfully tested link tag insertion');
   } else {
     t.fail();
   }
@@ -25,7 +24,6 @@ test('insert', t => {
 
   if (hasFile) {
     t.pass();
-    console.log('Successfully tested for favicon files');
   } else {
     t.fail();
   }
@@ -40,7 +38,6 @@ test('manifest', t => {
 
   if (hasFile) {
     t.pass();
-    console.log('Successfully tested manifest files');
   } else {
     t.fail();
   }
