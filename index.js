@@ -1,11 +1,11 @@
 const fs = require('fs');
-const path = require('path');
 const favicons = require('favicons');
 
 class WebpackFavicon {
   constructor(options) {
     this.options = Object.assign({
       src: false,
+      path: '',
       appName: null,                            // Your application's name. `string`
       appShortName: null,                       // Your application's short_name. `string`. Optional. If not set, appName will be used
       appDescription: null,                     // Your application's description. `string`
@@ -18,7 +18,7 @@ class WebpackFavicon {
       appleStatusBarStyle: "black-translucent", // Style for Apple status bar: "black-translucent", "default", "black". `string`
       display: "standalone",                    // Preferred display mode: "fullscreen", "standalone", "minimal-ui" or "browser". `string`
       orientation: "any",                       // Default orientation: "any", "natural", "portrait" or "landscape". `string`
-      scope: "/",                               // set of URLs that the browser considers within your app
+      scope: '',                               // set of URLs that the browser considers within your app
       start_url: "/?homescreen=1",              // Start URL when launching the application from a device. `string`
       version: "1.0",                           // Your application's version string. `string`
       logging: false,                           // Print logs to console? `boolean`
@@ -53,7 +53,6 @@ class WebpackFavicon {
 
   apply(compiler) {
     let { output } = compiler.options;
-    this.options.path = output.path;
 
     /* Ensure our ouput directory exists */
     if (!fs.existsSync(output.path)){
@@ -61,8 +60,8 @@ class WebpackFavicon {
     }
 
     if (this.options.src && output.path) {
-      // add images to build
-      compiler.hooks.make.tap({ name: 'WebpackFavicon' }, (compilation) => {
+      // HTML link tag injections
+      compiler.hooks.thisCompilation.tap({ name: 'WebpackFavicon' }, (compilation) => {
         compilation.hooks.processAssets.tap(
           {
             name: 'WebpackFavicon',
@@ -85,19 +84,38 @@ class WebpackFavicon {
         );
       });
 
-      compiler.hooks.emit.tap({ name: 'WebpackFavicon'}, () => {
-        Object.keys(this.images).map((i) => {
-          let image = this.images[i];
-
-          fs.writeFile(
-            path.resolve(`${compiler.options.output.path}/${image.name}`), 
-            image.contents, 
-            (err) => {
-              if (err) { console.log(err); }
-              return true;
+      // Images and Manifest
+      compiler.hooks.compilation.tap({ name: 'WebpackFavicon'}, (compilation) => {
+        compilation.hooks.processAssets.tap(
+          {
+            name: 'WebpackFavicon',
+            stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages
+            additionalAssets: false          
+          },
+          (assets) => {
+            // Adds generated images to build
+            if (this.images) {
+              Object.keys(this.images).map((i) => {
+                let image = this.images[i];
+                assets[`${this.options.path}${image.name}`] = {
+                  source: () => image.contents,
+                  size: () => image.contents.length
+                };
+              });
             }
-          );
-        });
+
+            // Adds manifest json and xml files to build
+            if (this.files) {
+              Object.keys(this.files).map((i) => {
+                let file = this.files[i];
+                assets[`${this.options.path}${file.name}`] = {
+                  source: () => file.contents,
+                  size: () => file.contents.length
+                };
+              }); 
+            }           
+          }
+        );
       });
     }     
   }

@@ -36,19 +36,21 @@ module.exports = {
     }),
     new WebpackFavicons({
       'src': 'assets/favicon.svg',
+      'path': 'assets/',
+      'scope': 'resources/',
       'background': '#000',
       'theme_color': '#000',
       'icons': {
-        'android': false,
-        'appleIcon': false,
-        'appleStartup': false,
-        'coast': false,
+        'android': true,
+        'appleIcon': true,
+        'appleStartup': true,
+        'coast': true,
         'favicons': true,
-        'firefox': false,
-        'opengraph': false,
-        'twitter': false,
-        'yandex': false,
-        'windows': false
+        'firefox': true,
+        'opengraph': true,
+        'twitter': true,
+        'yandex': true,
+        'windows': true
       }
     })  
   ]

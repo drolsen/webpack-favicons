@@ -18,7 +18,21 @@ test('write', t => {
 
 test('insert', t => {
   let hasFile = false;
-    if (fs.existsSync(path.resolve(__dirname, '../dist/favicon.ico'))){
+    if (fs.existsSync(path.resolve(__dirname, '../dist/assets/favicon.ico'))){
+      hasFile = true;
+    }
+
+  if (hasFile) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
+
+test('manifest', t => {
+  let hasFile = false;
+    if (fs.existsSync(path.resolve(__dirname, '../dist/assets/manifest.json'))){
       hasFile = true;
     }
 
