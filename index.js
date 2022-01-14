@@ -1,7 +1,7 @@
 const fs = require('fs');
 const favicons = require('favicons');
 
-class WebpackFavicon {
+class WebpackFavicons {
   constructor(options) {
     this.options = Object.assign({
       src: false,
@@ -18,7 +18,7 @@ class WebpackFavicon {
       appleStatusBarStyle: "black-translucent", // Style for Apple status bar: "black-translucent", "default", "black". `string`
       display: "standalone",                    // Preferred display mode: "fullscreen", "standalone", "minimal-ui" or "browser". `string`
       orientation: "any",                       // Default orientation: "any", "natural", "portrait" or "landscape". `string`
-      scope: '',                               // set of URLs that the browser considers within your app
+      scope: '',                                // set of URLs that the browser considers within your app
       start_url: "/?homescreen=1",              // Start URL when launching the application from a device. `string`
       version: "1.0",                           // Your application's version string. `string`
       logging: false,                           // Print logs to console? `boolean`
@@ -35,20 +35,6 @@ class WebpackFavicon {
         yandex: true                // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       }      
     }, options);
-
-    favicons(
-      this.options.src,
-      this.options, 
-      (error, response) => {
-        if (error) {
-          console.log(error.message); // Error description e.g. "An unknown error has occurred"
-          return;
-        }
-        this.html = response.html;
-        this.files = response.files;
-        this.images = response.images; 
-      }
-    );
   }
 
   apply(compiler) {
@@ -56,39 +42,59 @@ class WebpackFavicon {
 
     /* Ensure our ouput directory exists */
     if (!fs.existsSync(output.path)){
-      fs.mkdirSync(output.path);
+      fs.mkdirSync(output.path, { recursive: true });
     }
 
     if (this.options.src && output.path) {
       // HTML link tag injections
-      compiler.hooks.thisCompilation.tap({ name: 'WebpackFavicon' }, (compilation) => {
-        compilation.hooks.processAssets.tap(
+      compiler.hooks.thisCompilation.tap({ name: 'WebpackFavicons' }, (compilation) => {
+        compilation.hooks.processAssets.tapPromise(
           {
-            name: 'WebpackFavicon',
-            stage: compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS, // see below for more stages
-            additionalAssets: true          
+            name: 'WebpackFavicons',
+            stage: compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS, // see below for more stages  
+            additionalAssets: true    
           },
           (assets) => {
-            Object.keys(assets).map((i) => {
-              // limit assets to only .html files
-              if (i.indexOf('.html') !== -1) {
-                // get .html file's source out of buffer and into string
-                let HTML = assets[i]._value.toString();
-                assets[i]._value = HTML.replace(
-                  /<head>([\s\S]*?)<\/head>/,
-                 `<head>$1\r${this.html.join('\r')}</head>`
-                );
+            return favicons(
+              this.options.src,
+              this.options, 
+              (error, response) => {
+                if (error) {
+                  console.error(error.message); // Error description e.g. "An unknown error has occurred"
+                  return;
+                }
+
+                this.html = response.html.join('\r');
+                this.files = response.files;
+                this.images = response.images;
+
+                Object.keys(assets).map((i) => {
+                  // limit assets to only .html files
+                  if (i.indexOf('.html') !== -1) {
+                    // get .html file's source out of buffer and into string
+                    let HTML = assets[i]._value.toString();
+
+                    if (compiler.options.output.publicPath !== 'auto') {
+                      this.html = this.html.replace(/href="/g, `href="${compiler.options.output.publicPath}`);
+                    }
+
+                    assets[i]._value = HTML.replace(
+                      /<head>([\s\S]*?)<\/head>/,
+                     `<head>$1\r${this.html}</head>`
+                    );
+                  }
+                });
               }
-            });
+            );
           }
         );
       });
 
       // Images and Manifest
-      compiler.hooks.compilation.tap({ name: 'WebpackFavicon'}, (compilation) => {
+      compiler.hooks.compilation.tap({ name: 'WebpackFavicons'}, (compilation) => {
         compilation.hooks.processAssets.tap(
           {
-            name: 'WebpackFavicon',
+            name: 'WebpackFavicons',
             stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages
             additionalAssets: false          
           },
@@ -121,4 +127,4 @@ class WebpackFavicon {
   }
 }
 
-module.exports = WebpackFavicon;
+module.exports = WebpackFavicons;
