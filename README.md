@@ -2,9 +2,13 @@
   <img src="/assets/logo.png" width="500" />
   <p style="margin-top: 25px;">Plugin to generate favicons for browsers and devices.</p>
 
-[![Build Status](https://travis-ci.com/drolsen/webpack-favicons.svg?branch=master)](https://travis-ci.com/drolsen/webpack-favicons)
-[![dependencies Status](https://david-dm.org/drolsen/webpack-favicons/status.svg)](https://david-dm.org/drolsen/webpack-favicons)
-[![devDependencies Status](https://david-dm.org/drolsen/webpack-favicons/dev-status.svg)](https://david-dm.org/drolsen/webpack-favicons?type=dev)
+[![Build Status](https://app.travis-ci.com/drolsen/webpack-favicons.svg?branch=master)](https://app.travis-ci.com/drolsen/webpack-favicons)
+[![Minimum node.js version](https://badgen.net/npm/node/webpack-favicons)](https://npmjs.com/package/webpack-favicons)
+[![downloads](https://img.shields.io/npm/dm/webpack-favicons.svg?style=flat-square)](http://npm-stat.com/charts.html?package=webpack-favicons&from=2022-01-08)
+[![version](https://img.shields.io/npm/v/webpack-favicons.svg?style=flat-square)](http://npm.im/webpack-favicons)
+[![GitLab release](https://badgen.net/github/releases/drolsen/webpack-favicons)](https://github.com/drolsen/webpack-favicons/releases)
+[![MIT License](https://img.shields.io/npm/l/webpack-favicons.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/drolsen/webpack-favicons/graphs/commit-activity)
 </div>
 
 ### Does this plugin work with Webpack 4?
