@@ -7,7 +7,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
     path: path.resolve(__dirname, '../dist'), 
-    filename: '../dist/test.js',
+    filename: 'test.js',
     pathinfo: false
   },
   module: {
@@ -27,7 +27,9 @@ module.exports = {
     minimize: false
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/')]
+    }),
     new HtmlWebpackPlugin({
       'title': 'Basic Test',
       'template': './test/test.html',
@@ -41,16 +43,16 @@ module.exports = {
       'background': '#000',
       'theme_color': '#000',
       'icons': {
-        'android': true,
-        'appleIcon': true,
-        'appleStartup': true,
-        'coast': true,
+        'android': false,
+        'appleIcon': false,
+        'appleStartup': false,
+        'coast': false,
         'favicons': true,
-        'firefox': true,
-        'opengraph': true,
-        'twitter': true,
-        'yandex': true,
-        'windows': true
+        'firefox': false,
+        'opengraph': false,
+        'twitter': false,
+        'yandex': false,
+        'windows': false
       }
     })  
   ]

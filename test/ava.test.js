@@ -29,14 +29,27 @@ test('insert', t => {
   }
 });
 
-
-test('manifest', t => {
+test('nested', t => {
   let hasFile = false;
-    if (fs.existsSync(path.resolve(__dirname, '../dist/assets/manifest.json'))){
+    if (fs.existsSync(path.resolve(__dirname, '../dist/nested/assets/favicon.ico'))){
       hasFile = true;
     }
 
   if (hasFile) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
+test('publicPath', t => {
+  let insert = false;
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/public/test.html'), 'utf8');
+  if (testData.toString().indexOf('href="/~media/') !== -1) {
+    insert = true;
+  }
+
+  if (insert) {
     t.pass();
   } else {
     t.fail();
