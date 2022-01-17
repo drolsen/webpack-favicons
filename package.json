@@ -8,7 +8,7 @@
     "webpack html favicon",
     "webpack favicons"
   ],
-  "version": "1.2.0",
+  "version": "1.2.5",
   "description": "Webpack plugin to generate favicons for devices and browsers",
   "repository": "drolsen/webpack-favicons",
   "bugs": {
@@ -21,6 +21,7 @@
     "basic-test": "webpack --config ./test/basic.config.js --mode production",
     "nested-test": "webpack --config ./test/nested.config.js --mode production",
     "public-test": "webpack --config ./test/public-path.config.js --mode production",
+    "mixed-test": "webpack --config ./test/mixed-path.config.js --mode production",
     "ava-test": "ava ./test/ava.test.js"
   },
   "engines": {
