@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const favicons = require('favicons');
 
 class WebpackFavicons {
@@ -75,7 +76,9 @@ class WebpackFavicons {
                     let HTML = assets[i]._value.toString();
 
                     if (compiler.options.output.publicPath !== 'auto') {
-                      this.html = this.html.replace(/href="/g, `href="${compiler.options.output.publicPath}`);
+                      this.html = this.html.replace(/href="(.*?)"/g, (match, p1, string) => {
+                        return `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
+                      });
                     }
 
                     assets[i]._value = HTML.replace(
@@ -103,7 +106,7 @@ class WebpackFavicons {
             if (this.images) {
               Object.keys(this.images).map((i) => {
                 let image = this.images[i];
-                assets[`${this.options.path}${image.name}`] = {
+                assets[path.normalize(`\/${this.options.path}/${image.name}`)] = {
                   source: () => image.contents,
                   size: () => image.contents.length
                 };
@@ -114,7 +117,7 @@ class WebpackFavicons {
             if (this.files) {
               Object.keys(this.files).map((i) => {
                 let file = this.files[i];
-                assets[`${this.options.path}${file.name}`] = {
+                assets[path.normalize(`\/${this.options.path}/${file.name}`)] = {
                   source: () => file.contents,
                   size: () => file.contents.length
                 };

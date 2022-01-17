@@ -16,7 +16,7 @@ No, you should checkout https://github.com/jantimon/favicons-webpack-plugin for 
 
 
 ### How does it works
-By tapping into the Webpack5's latest hook updates, WebackFavicon digs into the build to search for any instances of HTML file assets.
+By tapping into the Webpack 5's latest hook updates, WebackFavicon digs into the build to search for any instances of HTML file assets.
 While doing that, it leverages the favicon (https://github.com/itgalaxy/favicons) module to generate configured favicons off your provided source file.
 
 Once everything is done, you have device and browser specific generated favicons from a single source and any / all HTML files now have corresponding link tags now injected.
@@ -35,17 +35,45 @@ yarn add --dev webpack-favicons
 const WebpackFavicons = require('webpack-favicons');
 ```
 Instantiate a `new WebpackFavicons()` class within Webpack configuration's plugin array:
+
 ```js
+
+// Basic configuration
+
 module.exports = {
-  "plugins": [
+  output: {
+    path: '/dist', 
+    publicPath: '/~media/'
+  }  
+  plugins: [
     new WebpackFavicons({
-      src: 'path/to/favicon.svg'
+      src: 'assets/favicon.svg',
+      path: 'img',
+      background: '#000',
+      theme_color: '#000',
+      icons: {
+        favicons: true,
+      }
     })
   ]
 };
 ```
-Recommended that your source favicon file be a SVG vector file. This allow for best possible quality of generated pixel based favicons.
 
+Will result in file being written to:
+- /dist/img/favicon.ico
+- /dist/img/favicon16x16.png 
+- /dist/img/favicon32x32.png
+- /dist/img/favicon48x48.png
+
+While our HTML file will have paths to favicons as:
+```html
+<link rel="shortcut icon" href="/~media/img/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/~media/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/~media/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/~media/img/favicon-48x48.png">
+```
+
+It is recommended that your source favicon file be a SVG vector file to allow best possible quality to generated pixel based favicons from.
 
 
 ## Options
@@ -56,7 +84,7 @@ For much more information about these options please visit: https://github.com/i
 Option | Type | Description
 --- | --- | ---
 `src` | String | Path to the source favicon file which all favicons will be generated from
-`path` | String | Path for overriding default icons path.
+`path` | String | Path to where icons get written (is relative to webpack's `output.path`)
 `appName` | String | Your application's name.
 `appShortName` | String | Your application's short_name. (Optional. If not set, appName will be used)
 `appDescription` | String | Your application's description.
@@ -76,6 +104,7 @@ Option | Type | Description
 `pixel_art` | String | Keeps pixels "sharp" when scaling up, for pixel art.  Only supported in offline mode.
 `loadManifestWithCredentials` | Boolean | Browsers don't send cookies when fetching a manifest, enable this to fix that.
 `icons` | Object | See below for more details about this object's options.
+
 
 ## Icon Object's Options
 Option | Type | Description
