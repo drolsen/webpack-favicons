@@ -6,7 +6,7 @@ const path = require('path');
 module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
-    path: path.resolve(__dirname, '../dist/mixed'), 
+    path: path.resolve(__dirname, '../dist/mixed/'), 
     publicPath: '/~media/',
     filename: 'test.js',
     pathinfo: false

@@ -16,7 +16,7 @@ test('write', t => {
   }
 });
 
-test('insert', t => {
+test('generate', t => {
   let hasFile = false;
     if (fs.existsSync(path.resolve(__dirname, '../dist/assets/favicon.ico'))){
       hasFile = true;
@@ -29,7 +29,7 @@ test('insert', t => {
   }
 });
 
-test('nested', t => {
+test('nested-folders', t => {
   let hasFile = false;
     if (fs.existsSync(path.resolve(__dirname, '../dist/nested/assets/favicon.ico'))){
       hasFile = true;
@@ -42,10 +42,24 @@ test('nested', t => {
   }
 });
 
-test('publicPath', t => {
+test('public-path-test', t => {
   let insert = false;
   const testData = fs.readFileSync(path.resolve(__dirname, '../dist/public/test.html'), 'utf8');
   if (testData.toString().indexOf('href="/~media/') !== -1) {
+    insert = true;
+  }
+
+  if (insert) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
+test('mixed-pathing-test', t => {
+  let insert = false;
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/mixed/test.html'), 'utf8');
+  if (testData.toString().indexOf('href="/~media/assets/favicon') !== -1) {
     insert = true;
   }
 
