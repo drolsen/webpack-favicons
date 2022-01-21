@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { sources } = require('webpack');
 
 class WebpackFavicons {
   constructor(options) {
@@ -25,17 +24,19 @@ class WebpackFavicons {
       logging: false,                           // Print logs to console? `boolean`
       pixel_art: false,                         // Keeps pixels "sharp" when scaling up, for pixel art.  Only supported in offline mode.
       loadManifestWithCredentials: false,       // Browsers don't send cookies when fetching a manifest, enable this to fix that. `boolean`
-      icons: {
-        android: true,              // Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        appleIcon: true,            // Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        appleStartup: true,         // Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        coast: true,                // Create Opera Coast icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        favicons: true,             // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        firefox: true,              // Create Firefox OS icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        windows: true,              // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-        yandex: true                // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-      }      
+      icons: { favicons: true }      
     }, options);
+
+    this.options.icons = Object.assign({
+      android: false,                          // Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      appleIcon: false,                        // Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      appleStartup: false,                     // Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      coast: false,                            // Create Opera Coast icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      favicons: false,                          // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      firefox: false,                          // Create Firefox OS icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      windows: false,                          // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      yandex: false                            // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+    }, this.options.icons);
   }
 
   apply(compiler) {
@@ -60,14 +61,9 @@ class WebpackFavicons {
               this.options.src,
               this.options, 
               (error, response) => {
-                if (error) {
-                  console.error(error.message); // Error description e.g. "An unknown error has occurred"
-                  return;
-                }
+                if (error) { console.error(error.message); return; }
 
                 this.html = response.html.join('\r');
-                this.files = response.files;
-                this.images = response.images;
 
                 // Adds favicon markup to any html documents
                 Object.keys(assets).map((i) => {
@@ -82,18 +78,15 @@ class WebpackFavicons {
                       });
                     }
 
-                    assets[i]._value = HTML.replace(
-                      /<head>([\s\S]*?)<\/head>/,
-                     `<head>$1\r${this.html}</head>`
-                    );
+                    assets[i]._value = HTML.replace(/<head>([\s\S]*?)<\/head>/, `<head>$1\r${this.html}</head>`);
                   }
                 });
 
                 // Adds generated images to build
-                if (this.images) {
-                  Object.keys(this.images).map((i) => {
-                    let image = this.images[i];
-                    assets[path.normalize(`/${this.options.path}/${image.name}`).replace(/\\/g, '/')] = {
+                if (response.images) {
+                  Object.keys(response.images).map((i) => {
+                    let image = response.images[i];
+                    assets[path.normalize(`/${this.options.path}/${image.name}`)] = {
                       source: () => image.contents,
                       size: () => image.contents.length
                     };
@@ -101,9 +94,9 @@ class WebpackFavicons {
                 }
 
                 // Adds manifest json and xml files to build
-                if (this.files) {
-                  Object.keys(this.files).map((i) => {
-                    let file = this.files[i];
+                if (response.files) {
+                  Object.keys(response.files).map((i) => {
+                    let file = response.files[i];
                     assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
                       source: () => file.contents,
                       size: () => file.contents.length
@@ -114,20 +107,6 @@ class WebpackFavicons {
                 return assets;                      
               }
             ));
-          }
-        );
-      });
-
-      // Images and Manifest
-      compiler.hooks.compilation.tap({ name: 'WebpackFavicons'}, (compilation) => {
-        compilation.hooks.processAssets.tap(
-          {
-            name: 'WebpackFavicons',
-            stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages
-            additionalAssets: false          
-          },
-          (assets) => {
-         
           }
         );
       });

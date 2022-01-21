@@ -6,8 +6,7 @@ const path = require('path');
 module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
-    path: path.resolve(__dirname, '../dist/public'), 
-    publicPath: '/~media/',
+    path: path.resolve(__dirname, '../dist/default'), 
     filename: 'test.js',
     pathinfo: false
   },
@@ -29,7 +28,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/public')]
+      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/default')]
     }),
     new HtmlWebpackPlugin({
       'title': 'Basic Test',
@@ -42,10 +41,7 @@ module.exports = {
       'path': 'assets/',
       'scope': 'resources/',
       'background': '#000',
-      'theme_color': '#000',
-      'icons': {
-        'favicons': true
-      }
+      'theme_color': '#000'
     })  
   ]
 };

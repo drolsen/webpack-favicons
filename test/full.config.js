@@ -6,7 +6,7 @@ const path = require('path');
 module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
-    path: path.resolve(__dirname, '../dist/public'), 
+    path: path.resolve(__dirname, '../dist/full/'), 
     publicPath: '/~media/',
     filename: 'test.js',
     pathinfo: false
@@ -29,7 +29,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/public')]
+      'cleanOnceBeforeBuildPatterns': [path.resolve(__dirname, '../dist/full')]
     }),
     new HtmlWebpackPlugin({
       'title': 'Basic Test',
@@ -38,13 +38,17 @@ module.exports = {
       'minify': false
     }),
     new WebpackFavicons({
-      'src': 'assets/favicon.svg',
-      'path': 'assets/',
-      'scope': 'resources/',
+      'src': 'assets/favicon.png',
+      'path': 'assets',
       'background': '#000',
       'theme_color': '#000',
       'icons': {
-        'favicons': true
+        'android': true,
+        'appleIcon': true,
+        'appleStartup': true,
+        'favicons': true,
+        'yandex': true,
+        'windows': true
       }
     })  
   ]

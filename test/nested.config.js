@@ -43,16 +43,7 @@ module.exports = {
       'background': '#000',
       'theme_color': '#000',
       'icons': {
-        'android': false,
-        'appleIcon': false,
-        'appleStartup': false,
-        'coast': false,
-        'favicons': true,
-        'firefox': false,
-        'opengraph': false,
-        'twitter': false,
-        'yandex': false,
-        'windows': false
+        'favicons': true
       }
     })  
   ]
