@@ -134,3 +134,22 @@ test('full-test (all favicon types)', t => {
     t.fail();
   }
 });
+
+test('callback-test', t => {
+  let test = false;
+
+  if (fs.existsSync(path.resolve(__dirname, '../dist/callback/assets/custom.ico'))){
+    test = true;
+  }
+
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/callback/test.html'), 'utf8');
+  if (testData.toString().indexOf('custom.ico') === -1) {
+    test = false;
+  }  
+
+  if (hasFile) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});

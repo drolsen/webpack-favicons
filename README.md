@@ -65,7 +65,7 @@ Will result in file(s) being written to:
 - /dist/img/favicon32x32.png
 - /dist/img/favicon48x48.png
 
-While any HTML with a `<head>` tag file will have paths to favicons added:
+While any HTML with a `<head>` tag will have paths to favicons added:
 ```html
 <link rel="shortcut icon" href="/~media/img/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="/~media/img/favicon-16x16.png">
@@ -75,6 +75,7 @@ While any HTML with a `<head>` tag file will have paths to favicons added:
 
 It is recommended that your source favicon file be a SVG vector file to allow best possible quality to generated pixel based favicons from.
 
+---
 
 ## Options
 
@@ -105,7 +106,7 @@ Option | Type | Description
 `loadManifestWithCredentials` | Boolean | Browsers don't send cookies when fetching a manifest, enable this to fix that.
 `icons` | Object | See below for more details about this object's options.
 
-
+---
 
 ## Icon Object's Options
 
@@ -120,7 +121,39 @@ Option | Type | Description
 `windows` | Boolean | Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 `yandex` | Boolean | Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
 
+---
 
+## Callback
+
+Optional callback allowing the opportunity to alter the generated images, html and manifest file(s) data prior to Webpack writing anything to disk:
+
+```js
+
+// Basic configuration
+
+module.exports = {
+  output: {
+    path: '/dist', 
+    publicPath: '/~media/'
+  }  
+  plugins: [
+    new WebpackFavicons({
+      src: 'assets/favicon.svg',
+      path: 'img',
+      background: '#000',
+      theme_color: '#000',
+      icons: {
+        favicons: true
+      }
+    }, (response) => {
+      // alter generated images, html or manifest file data here
+      response.images[0].name = 'custom.ico';
+    })
+  ]
+};
+```
+
+---
 
 ### Tests
 
