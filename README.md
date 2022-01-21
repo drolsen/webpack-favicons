@@ -138,16 +138,11 @@ module.exports = {
   }  
   plugins: [
     new WebpackFavicons({
-      src: 'assets/favicon.svg',
-      path: 'img',
-      background: '#000',
-      theme_color: '#000',
-      icons: {
-        favicons: true
-      }
+      ...
     }, (response) => {
       // alter generated images, html or manifest file data here
       response.images[0].name = 'custom.ico';
+      response.html[0] = response.html[0].replace('favicon.ico', 'custom.ico');
     })
   ]
 };
