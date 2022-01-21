@@ -12,14 +12,14 @@
 </div>
 
 ### Does this plugin work with Webpack 4?
-No, you should checkout https://github.com/jantimon/favicons-webpack-plugin for a Webpack4 compatible plugin.
+No, you should checkout https://github.com/jantimon/favicons-webpack-plugin for a Webpack 4 compatible plugin.
 
 
 ### How does it works
-By tapping into the Webpack 5's latest hook updates, WebackFavicon digs into the build to search for any instances of HTML file assets.
+By tapping into the Webpack 5's latest hooks, WebackFavicon digs into a given build to search for any instances of HTML file assets.
 While doing that, it leverages the favicon (https://github.com/itgalaxy/favicons) module to generate configured favicons off your provided source file.
 
-Once everything is done, you have device and browser specific generated favicons from a single source and any / all HTML files now have corresponding link tags now injected.
+Once done, you will have device or browser specific generated favicons written to disk while HTML files (with a `<head>` tag) will have corresponding `<link />` tags injected.
 
 ---
 ## Install
@@ -52,20 +52,20 @@ module.exports = {
       background: '#000',
       theme_color: '#000',
       icons: {
-        favicons: true,
+        favicons: true
       }
     })
   ]
 };
 ```
 
-Will result in file being written to:
+Will result in file(s) being written to:
 - /dist/img/favicon.ico
 - /dist/img/favicon16x16.png 
 - /dist/img/favicon32x32.png
 - /dist/img/favicon48x48.png
 
-While our HTML file will have paths to favicons as:
+While any HTML with a `<head>` tag file will have paths to favicons added:
 ```html
 <link rel="shortcut icon" href="/~media/img/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="/~media/img/favicon-16x16.png">
@@ -106,7 +106,9 @@ Option | Type | Description
 `icons` | Object | See below for more details about this object's options.
 
 
+
 ## Icon Object's Options
+
 Option | Type | Description
 --- | --- | ---
 `android` | Boolean | Create Android homescreen icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
