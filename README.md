@@ -122,7 +122,7 @@ Option | Type | Description
 
 ### Tests
 
-Webpack Favicons comes with one `test`.
+Webpack Favicons comes with a few `test`s.
 These helps ensure that both favicons get written to disk and that link tags are injected into any HTML assets within the larger Webpack build process.
 
 Simply run `npm run test` or `yarn test` from the root of the plugin to run test.

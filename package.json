@@ -8,7 +8,7 @@
     "webpack html favicon",
     "webpack favicons"
   ],
-  "version": "1.2.5",
+  "version": "1.3.0",
   "description": "Webpack plugin to generate favicons for devices and browsers",
   "repository": "drolsen/webpack-favicons",
   "bugs": {
@@ -17,7 +17,7 @@
   "author": "Devin R. Olsen <devin@devinrolsen.com> (http://devinrolsen.com)",
   "license": "MIT",
   "scripts": {
-    "test": "npm run basic-test && npm run nested-test && npm run public-test && npm run ava-test",
+    "test": "npm run basic-test && npm run nested-test && npm run public-test && npm run mixed-test && npm run ava-test",
     "basic-test": "webpack --config ./test/basic.config.js --mode production",
     "nested-test": "webpack --config ./test/nested.config.js --mode production",
     "public-test": "webpack --config ./test/public-path.config.js --mode production",
@@ -36,6 +36,6 @@
     "webpack-cli": "4.9.1"
   },
   "dependencies": {
-    "favicons": "6.2.2"
+    "favicons": "7.0.0-beta.1"
   }
 }
