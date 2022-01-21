@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const favicons = require('favicons');
+const { sources } = require('webpack');
 
 class WebpackFavicons {
   constructor(options) {
@@ -52,11 +52,11 @@ class WebpackFavicons {
         compilation.hooks.processAssets.tapPromise(
           {
             name: 'WebpackFavicons',
-            stage: compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS, // see below for more stages  
+            stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages  
             additionalAssets: true    
           },
           (assets) => {
-            return favicons(
+            return import('favicons').then((module) => module.favicons(
               this.options.src,
               this.options, 
               (error, response) => {
@@ -69,6 +69,7 @@ class WebpackFavicons {
                 this.files = response.files;
                 this.images = response.images;
 
+                // Adds favicon markup to any html documents
                 Object.keys(assets).map((i) => {
                   // limit assets to only .html files
                   if (i.indexOf('.html') !== -1) {
@@ -87,8 +88,32 @@ class WebpackFavicons {
                     );
                   }
                 });
+
+                // Adds generated images to build
+                if (this.images) {
+                  Object.keys(this.images).map((i) => {
+                    let image = this.images[i];
+                    assets[path.normalize(`/${this.options.path}/${image.name}`).replace(/\\/g, '/')] = {
+                      source: () => image.contents,
+                      size: () => image.contents.length
+                    };
+                  });
+                }
+
+                // Adds manifest json and xml files to build
+                if (this.files) {
+                  Object.keys(this.files).map((i) => {
+                    let file = this.files[i];
+                    assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
+                      source: () => file.contents,
+                      size: () => file.contents.length
+                    };
+                  }); 
+                }
+
+                return assets;                      
               }
-            );
+            ));
           }
         );
       });
@@ -102,27 +127,7 @@ class WebpackFavicons {
             additionalAssets: false          
           },
           (assets) => {
-            // Adds generated images to build
-            if (this.images) {
-              Object.keys(this.images).map((i) => {
-                let image = this.images[i];
-                assets[path.normalize(`\/${this.options.path}/${image.name}`)] = {
-                  source: () => image.contents,
-                  size: () => image.contents.length
-                };
-              });
-            }
-
-            // Adds manifest json and xml files to build
-            if (this.files) {
-              Object.keys(this.files).map((i) => {
-                let file = this.files[i];
-                assets[path.normalize(`\/${this.options.path}/${file.name}`)] = {
-                  source: () => file.contents,
-                  size: () => file.contents.length
-                };
-              }); 
-            }           
+         
           }
         );
       });
