@@ -147,7 +147,7 @@ test('callback-test', t => {
     test = false;
   }  
 
-  if (hasFile) {
+  if (test) {
     t.pass();
   } else {
     t.fail();
