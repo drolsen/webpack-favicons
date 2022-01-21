@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 class WebpackFavicons {
-  constructor(options) {
+  constructor(options, callback) {
     this.options = Object.assign({
       src: false,
       path: '',
@@ -37,6 +37,8 @@ class WebpackFavicons {
       windows: false,                          // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       yandex: false                            // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
     }, this.options.icons);
+
+    this.callback = callback;
   }
 
   apply(compiler) {
@@ -56,58 +58,58 @@ class WebpackFavicons {
             stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages  
             additionalAssets: true    
           },
-          (assets) => {
-            return import('favicons').then((module) => module.favicons(
-              this.options.src,
-              this.options, 
-              (error, response) => {
-                if (error) { console.error(error.message); return; }
-
-                this.html = response.html.join('\r');
-
-                // Adds favicon markup to any html documents
-                Object.keys(assets).map((i) => {
-                  // limit assets to only .html files
-                  if (i.indexOf('.html') !== -1) {
-                    // get .html file's source out of buffer and into string
-                    let HTML = assets[i]._value.toString();
-
-                    if (compiler.options.output.publicPath !== 'auto') {
-                      this.html = this.html.replace(/href="(.*?)"/g, (match, p1, string) => {
-                        return `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
-                      });
-                    }
-
-                    assets[i]._value = HTML.replace(/<head>([\s\S]*?)<\/head>/, `<head>$1\r${this.html}</head>`);
-                  }
-                });
-
-                // Adds generated images to build
-                if (response.images) {
-                  Object.keys(response.images).map((i) => {
-                    let image = response.images[i];
-                    assets[path.normalize(`/${this.options.path}/${image.name}`)] = {
-                      source: () => image.contents,
-                      size: () => image.contents.length
-                    };
-                  });
-                }
-
-                // Adds manifest json and xml files to build
-                if (response.files) {
-                  Object.keys(response.files).map((i) => {
-                    let file = response.files[i];
-                    assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
-                      source: () => file.contents,
-                      size: () => file.contents.length
-                    };
-                  }); 
-                }
-
-                return assets;                      
+          (assets) => import('favicons').then((module) => module.favicons(
+            this.options.src,
+            this.options, 
+            (error, response) => {
+              if (error) { console.error(error.message); return; }
+              // Clean favicon <link href=".*" /> pathing
+              if (compiler.options.output.publicPath !== 'auto') {
+                response.html = Object.keys(response.html).map((i) => response.html[i].replace(/href="(.*?)"/g, (match, p1, string) => {
+                  return `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
+                }));
               }
-            ));
-          }
+
+              // Run callback
+              if (typeof this.callback === 'function') {
+                response = Object.assign({ ...response }, this.callback(response));
+              }
+
+              // Adds favicon markup to any html documents
+              Object.keys(assets).map((i) => {
+                // limit assets to only .html files
+                if (i.indexOf('.html') !== -1) {
+                  // get .html file's source out of buffer and into string
+                  let HTML = assets[i]._value.toString();
+                  assets[i]._value = HTML.replace(/<head>([\s\S]*?)<\/head>/, `<head>$1\r${response.html.join('\r')}</head>`);
+                }
+              });
+
+              // Adds generated images to build
+              if (response.images) {
+                Object.keys(response.images).map((i) => {
+                  let image = response.images[i];
+                  assets[path.normalize(`/${this.options.path}/${image.name}`)] = {
+                    source: () => image.contents,
+                    size: () => image.contents.length
+                  };
+                });
+              }
+
+              // Adds manifest json and xml files to build
+              if (response.files) {
+                Object.keys(response.files).map((i) => {
+                  let file = response.files[i];
+                  assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
+                    source: () => file.contents,
+                    size: () => file.contents.length
+                  };
+                }); 
+              }
+
+              return assets;                      
+            }
+          ))
         );
       });
     }     
