@@ -6,7 +6,7 @@ const path = require('path');
 module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
-    path: path.resolve(__dirname, '../dist'), 
+    path: path.resolve(__dirname, '../dist/basic'), 
     filename: 'test.js',
     pathinfo: false
   },
@@ -28,7 +28,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/')]
+      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist')]
     }),
     new HtmlWebpackPlugin({
       'title': 'Basic Test',

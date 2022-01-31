@@ -1,13 +1,13 @@
 const WebpackFavicons = require('../index.js');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 const path = require('path');
 
 module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
-    path: path.resolve(__dirname, '../dist/full/'), 
-    publicPath: '/~media/',
+    path: path.resolve(__dirname, '../dist/hybrid'), 
     filename: 'test.js',
     pathinfo: false
   },
@@ -29,26 +29,27 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve(__dirname, '../dist/full')]
+      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/hybrid/')]
     }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'test/test.html', to: './' }
+      ],
+    }),   
     new HtmlWebpackPlugin({
-      'title': 'Basic Test',
+      'title': 'Hybrid Test',
       'template': './test/test.html',
-      'filename': './test.html',
+      'filename': './testing.html',
       'minify': false
-    }),
+    }),     
     new WebpackFavicons({
       'src': 'assets/favicon.svg',
-      'path': 'assets',
+      'path': 'assets/',
+      'scope': 'resources/',
       'background': '#000',
       'theme_color': '#000',
       'icons': {
-        'android': true,
-        'appleIcon': true,
-        'appleStartup': true,
-        'favicons': true,
-        'yandex': true,
-        'windows': true
+        'favicons': true
       }
     })  
   ]
