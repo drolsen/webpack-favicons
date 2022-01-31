@@ -73,76 +73,74 @@ class WebpackFavicons {
                 response = Object.assign({ ...response }, this.callback(response));
               }
 
-              if (!Object.keys(assets).some((n) => n.indexOf('.html') !== -1)) {
-                //////// HtmlWebpackPlugin //////////
-                try {
-                  require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
-                    { name: 'WebpackFavicons' }, 
-                    (data, callback) => {
-                      // Loop over favicon's response HTML <link> tags
-                      Object.keys(response.html).map((i) => {
-                        // Collect <link> HTML attributes into key|value object
-                        let attrs = getAttributes(response.html[i]);
-                        const attributes = {};
+              //////// if HtmlWebpackPlugin found //////////
+              try {
+                require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
+                  { name: 'WebpackFavicons' }, 
+                  (data, callback) => {
+                    // Loop over favicon's response HTML <link> tags
+                    Object.keys(response.html).map((i) => {
+                      // Collect <link> HTML attributes into key|value object
+                      let attrs = getAttributes(response.html[i]);
+                      const attributes = {};
 
-                        Object.keys(attrs).map((j) => {
-                          const parts = attrs[j].split('=');
-                          const key = parts[0];
-                          const value = parts[1].slice(1, -1);
+                      Object.keys(attrs).map((j) => {
+                        const parts = attrs[j].split('=');
+                        const key = parts[0];
+                        const value = parts[1].slice(1, -1);
 
-                          attributes[key] = value;
+                        attributes[key] = value;
 
-                          if (
-                            key === 'href' 
-                            && compiler.options.output.publicPath !== 'auto'
-                          ) {
-                            attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
-                          }
-                        });
-
-                        // Push <link> HTML object data into HtmlWebpackPlugin meta template
-                        data.assetTags.meta.push({
-                          tagName: 'link',
-                          voidTag: true,
-                          meta: { plugin: 'WebpackFavicons' },
-                          attributes
-                        });
+                        if (
+                          key === 'href' 
+                          && compiler.options.output.publicPath !== 'auto'
+                        ) {
+                          attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
+                        }
                       });
 
-                      // Run required callback with altered data
-                      callback(null, data);
-                    }
-                  );
-                } catch (err) { }
-              } else {
-                //////// CopyWebpackPlugin //////////
-                Object.keys(assets).map((i) => {
-                  // Only alter .html files
-                  if (i.indexOf('.html') === -1) { return false; }
+                      // Push <link> HTML object data into HtmlWebpackPlugin meta template
+                      data.assetTags.meta.push({
+                        tagName: 'link',
+                        voidTag: true,
+                        meta: { plugin: 'WebpackFavicons' },
+                        attributes
+                      });
+                    });
 
-                  // Prepend output.plublicPath to favicon href paths by hand
-                  if (compiler.options.output.publicPath !== 'auto') {
-                    response.html = Object.keys(response.html).map(
-                      (i) => response.html[i].replace(
-                        /href="(.*?)"/g, 
-                        (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
-                      )
-                    );
+                    // Run required callback with altered data
+                    callback(null, data);
                   }
+                );
+              } catch (err) { }
 
-                  // Inject favicon <link> into .html document(s)
-                  let HTML = compilation.getAsset(i).source.source().toString();
-                  compilation.updateAsset(                
-                    i,
-                    new sources.RawSource(
-                      HTML.replace(
-                        /<head>([\s\S]*?)<\/head>/, 
-                        `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
-                      )
+              //////// if CopyWebpackPlugin found //////////
+              Object.keys(assets).map((i) => {
+                // Only alter .html files
+                if (i.indexOf('.html') === -1) { return false; }
+
+                // Prepend output.plublicPath to favicon href paths by hand
+                if (compiler.options.output.publicPath !== 'auto') {
+                  response.html = Object.keys(response.html).map(
+                    (i) => response.html[i].replace(
+                      /href="(.*?)"/g, 
+                      (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
                     )
                   );
-                });   
-              }           
+                }
+
+                // Inject favicon <link> into .html document(s)
+                let HTML = compilation.getAsset(i).source.source().toString();
+                compilation.updateAsset(                
+                  i,
+                  new sources.RawSource(
+                    HTML.replace(
+                      /<head>([\s\S]*?)<\/head>/, 
+                      `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
+                    )
+                  )
+                );
+              });         
 
               // Adds generated images to build
               if (response.images) {

@@ -147,10 +147,10 @@ test('callback-test (ensures callback can alter favicon data)', t => {
 });
 
 test('copy-test (ensures <link> added to html documented moved by CopyWebpackPlugin)', t => {
-  let copyTest = false;
+  let copyTest = true;
 
-  if (fs.existsSync(path.resolve(__dirname, '../dist/copy/test.html'))){
-    copyTest = true;
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/copy/test.html'))){
+    copyTest = false;
   }
 
   const testData = fs.readFileSync(path.resolve(__dirname, '../dist/copy/test.html'), 'utf8');
@@ -159,6 +159,34 @@ test('copy-test (ensures <link> added to html documented moved by CopyWebpackPlu
   }  
 
   if (copyTest) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
+test('hybrid-test (ensures <link>s added to both CopyWebpackPlugin and HtmlWebpackPlugin)', t => {
+  let hybridTest = true;
+
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/hybrid/test.html'))){
+    hybridTest = false;
+  }
+
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/hybrid/testing.html'))){
+    hybridTest = false;
+  }  
+
+  const testData1 = fs.readFileSync(path.resolve(__dirname, '../dist/hybrid/test.html'), 'utf8');
+  if (testData1.toString().indexOf('favicon.ico') === -1) {
+    hybridTest = false;
+  } 
+
+  const testData2 = fs.readFileSync(path.resolve(__dirname, '../dist/hybrid/testing.html'), 'utf8');
+  if (testData2.toString().indexOf('favicon.ico') === -1) {
+    hybridTest = false;
+  }    
+
+  if (hybridTest) {
     t.pass();
   } else {
     t.fail();
