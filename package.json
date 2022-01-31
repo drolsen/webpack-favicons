@@ -24,7 +24,6 @@
     "mixed-test": "webpack --config ./test/mixed-path.config.js --mode production",
     "full-test": "webpack --config ./test/full.config.js --mode production",
     "callback-test": "webpack --config ./test/callback.config.js --mode production",
-    "multi-test": "webpack --config ./test/multi-src.config.js --mode production",
     "minimal-test": "webpack --config ./test/minimal.config.js --mode production",
     "copy-test": "webpack --config ./test/copy.config.js --mode production",
     "ava-test": "ava ./test/ava.test.js"

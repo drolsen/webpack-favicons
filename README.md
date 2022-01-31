@@ -29,6 +29,7 @@ Yep! While it is more common to see a Webpack configuration using `HtmlWebpackPl
 ```
 npm i --save webpack-favicons
 ```
+or
 ```
 yarn add --dev webpack-favicons
 ```
