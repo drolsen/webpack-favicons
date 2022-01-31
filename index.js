@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { sources } = require('webpack');
+
+const getAttributes = (markup) => markup.match(/([^\r\n\t\f\v= '"]+)(?:=(["'])?((?:.(?!\2?\s+(?:\S+)=|\2))+.)\2?)?/g).slice(1, -1);
 
 class WebpackFavicons {
   constructor(options, callback) {
@@ -32,7 +35,7 @@ class WebpackFavicons {
       appleIcon: false,                        // Create Apple touch icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       appleStartup: false,                     // Create Apple startup images. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       coast: false,                            // Create Opera Coast icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
-      favicons: false,                          // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
+      favicons: true,                          // Create regular favicons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       firefox: false,                          // Create Firefox OS icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       windows: false,                          // Create Windows 8 tile icons. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
       yandex: false                            // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
@@ -56,34 +59,90 @@ class WebpackFavicons {
           {
             name: 'WebpackFavicons',
             stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages  
-            additionalAssets: true    
+            additionalAssets: false 
           },
           (assets) => import('favicons').then((module) => module.favicons(
             this.options.src,
             this.options, 
             (error, response) => {
+              // If we have parsing error lets stop
               if (error) { console.error(error.message); return; }
-              // Clean favicon <link href=".*" /> pathing
-              if (compiler.options.output.publicPath !== 'auto') {
-                response.html = Object.keys(response.html).map((i) => response.html[i].replace(/href="(.*?)"/g, (match, p1, string) => {
-                  return `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
-                }));
-              }
 
-              // Run callback
+              // Check/Run plugin callback
               if (typeof this.callback === 'function') {
                 response = Object.assign({ ...response }, this.callback(response));
               }
 
-              // Adds favicon markup to any html documents
-              Object.keys(assets).map((i) => {
-                // limit assets to only .html files
-                if (i.indexOf('.html') !== -1) {
-                  // get .html file's source out of buffer and into string
-                  let HTML = assets[i]._value.toString();
-                  assets[i]._value = HTML.replace(/<head>([\s\S]*?)<\/head>/, `<head>$1\r${response.html.join('\r')}</head>`);
-                }
-              });
+              if (!Object.keys(assets).some((n) => n.indexOf('.html') !== -1)) {
+                //////// HtmlWebpackPlugin //////////
+                try {
+                  require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
+                    { name: 'WebpackFavicons' }, 
+                    (data, callback) => {
+                      // Loop over favicon's response HTML <link> tags
+                      Object.keys(response.html).map((i) => {
+                        // Collect <link> HTML attributes into key|value object
+                        let attrs = getAttributes(response.html[i]);
+                        const attributes = {};
+
+                        Object.keys(attrs).map((j) => {
+                          const parts = attrs[j].split('=');
+                          const key = parts[0];
+                          const value = parts[1].slice(1, -1);
+
+                          attributes[key] = value;
+
+                          if (
+                            key === 'href' 
+                            && compiler.options.output.publicPath !== 'auto'
+                          ) {
+                            attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
+                          }
+                        });
+
+                        // Push <link> HTML object data into HtmlWebpackPlugin meta template
+                        data.assetTags.meta.push({
+                          tagName: 'link',
+                          voidTag: true,
+                          meta: { plugin: 'WebpackFavicons' },
+                          attributes
+                        });
+                      });
+
+                      // Run required callback with altered data
+                      callback(null, data);
+                    }
+                  );
+                } catch (err) { }
+              } else {
+                //////// CopyWebpackPlugin //////////
+                Object.keys(assets).map((i) => {
+                  // Only alter .html files
+                  if (i.indexOf('.html') === -1) { return false; }
+
+                  // Prepend output.plublicPath to favicon href paths by hand
+                  if (compiler.options.output.publicPath !== 'auto') {
+                    response.html = Object.keys(response.html).map(
+                      (i) => response.html[i].replace(
+                        /href="(.*?)"/g, 
+                        (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
+                      )
+                    );
+                  }
+
+                  // Inject favicon <link> into .html document(s)
+                  let HTML = compilation.getAsset(i).source.source().toString();
+                  compilation.updateAsset(                
+                    i,
+                    new sources.RawSource(
+                      HTML.replace(
+                        /<head>([\s\S]*?)<\/head>/, 
+                        `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
+                      )
+                    )
+                  );
+                });   
+              }           
 
               // Adds generated images to build
               if (response.images) {
@@ -110,7 +169,7 @@ class WebpackFavicons {
               return assets;                      
             }
           ))
-        );
+        );      
       });
     }     
   }

@@ -153,3 +153,22 @@ test('callback-test', t => {
     t.fail();
   }
 });
+
+test('copy-test', t => {
+  let test = false;
+
+  if (fs.existsSync(path.resolve(__dirname, '../dist/copy/test.html'))){
+    test = true;
+  }
+
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/copy/test.html'), 'utf8');
+  if (testData.toString().indexOf('favicon.ico') === -1) {
+    test = false;
+  }  
+
+  if (test) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
