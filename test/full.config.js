@@ -38,7 +38,7 @@ module.exports = {
       'minify': false
     }),
     new WebpackFavicons({
-      'src': 'assets/favicon.png',
+      'src': 'assets/favicon.svg',
       'path': 'assets',
       'background': '#000',
       'theme_color': '#000',
