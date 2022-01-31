@@ -4,13 +4,13 @@ const path = require('path');
  
 test('write (ensures <link> tags in test.HTML and favicons written to disk)', t => {
   let writeTest = true;
-  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/test.html'), 'utf8');
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/basic/test.html'), 'utf8');
   
   if (testData.toString().indexOf('<link rel="icon"') === -1) {
     writeTest = false;
   }
 
-  if (!fs.existsSync(path.resolve(__dirname, '../dist/assets/favicon.ico'))){
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/basic/assets/favicon.ico'))){
     writeTest = false;
   }
 
@@ -51,7 +51,7 @@ test('public-path-test (ensures output.publicPath accounted for)', t => {
 test('mixed-path-test (ensure output.publicPath and WebpackFavicons path accounted for)', t => {
   let mixedPathTest = false;
   const testData = fs.readFileSync(path.resolve(__dirname, '../dist/mixed/test.html'), 'utf8');
-  if (testData.toString().indexOf('href="/~media/assets/favicon') !== -1) {
+  if (testData.toString().indexOf('href="/~media/custom/favicon') !== -1) {
     mixedPathTest = true;
   }
 

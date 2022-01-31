@@ -39,7 +39,7 @@ module.exports = {
     }),
     new WebpackFavicons({
       'src': 'assets/favicon.svg',
-      'path': 'assets',
+      'path': 'custom',
       'background': '#000',
       'theme_color': '#000',
       'icons': {
