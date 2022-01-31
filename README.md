@@ -22,12 +22,12 @@ While doing that, it leverages the favicon (https://github.com/itgalaxy/favicons
 Once done, you will have device or browser specific generated favicons written to disk while HTML files (with a `<head>` tag) will have corresponding `<link>` tags injected.
 
 ### Does this work with CopyWebpackPlugin?
-Yep! While it is more common to see a Webpack configuration using `HtmlWebpackPlugin` in order to process .HTML files; WebpackFavicons will inject `<link>` tags into HTML documents found being copied by `CopyWebpackPlugin` alone.
+Yep! While it is more common to see a Webpack configuration using `HtmlWebpackPlugin` in order to process HTML files; WebpackFavicons will inject `<link>` tags into HTML documents found being copied by `CopyWebpackPlugin` and/or `HtmlWebpackPlugin`.
 
 ---
 ## Install
 ```
-npm i --save webpack-favicons
+npm i --save-dev webpack-favicons
 ```
 or
 ```
