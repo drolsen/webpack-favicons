@@ -17,7 +17,7 @@
   "author": "Devin R. Olsen <devin@devinrolsen.com> (http://devinrolsen.com)",
   "license": "MIT",
   "scripts": {
-    "test": "npm run basic-test && npm run nested-test && npm run public-test && npm run mixed-test && npm run default-test && npm run callback-test && npm run copy-test && npm run full-test && npm run ava-test",
+    "test": "npm run basic-test && npm run nested-test && npm run public-test && npm run mixed-test && npm run minimal-test && npm run callback-test && npm run copy-test && npm run full-test && npm run ava-test",
     "basic-test": "webpack --config ./test/basic.config.js --mode production",
     "nested-test": "webpack --config ./test/nested.config.js --mode production",
     "public-test": "webpack --config ./test/public-path.config.js --mode production",
@@ -25,7 +25,7 @@
     "full-test": "webpack --config ./test/full.config.js --mode production",
     "callback-test": "webpack --config ./test/callback.config.js --mode production",
     "multi-test": "webpack --config ./test/multi-src.config.js --mode production",
-    "default-test": "webpack --config ./test/default.config.js --mode production",
+    "minimal-test": "webpack --config ./test/minimal.config.js --mode production",
     "copy-test": "webpack --config ./test/copy.config.js --mode production",
     "ava-test": "ava ./test/ava.test.js"
   },
