@@ -27,7 +27,7 @@ class WebpackFavicons {
       logging: false,                           // Print logs to console? `boolean`
       pixel_art: false,                         // Keeps pixels "sharp" when scaling up, for pixel art.  Only supported in offline mode.
       loadManifestWithCredentials: false,       // Browsers don't send cookies when fetching a manifest, enable this to fix that. `boolean`
-      icons: { favicons: true }      
+      icons: { favicons: true }
     }, options);
 
     this.options.icons = Object.assign({
@@ -58,15 +58,14 @@ class WebpackFavicons {
         compilation.hooks.processAssets.tapPromise(
           {
             name: 'WebpackFavicons',
-            stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages  
-            additionalAssets: false 
+            stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages
+            additionalAssets: false
           },
           (assets) => import('favicons').then((module) => module.favicons(
             this.options.src,
-            this.options, 
-            (error, response) => {
+            this.options)
+            .then( response => {
               // If we have parsing error lets stop
-              if (error) { console.error(error.message); return; }
 
               // Check/Run plugin callback
               if (typeof this.callback === 'function') {
@@ -76,7 +75,7 @@ class WebpackFavicons {
               //////// if HtmlWebpackPlugin found //////////
               try {
                 require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
-                  { name: 'WebpackFavicons' }, 
+                  { name: 'WebpackFavicons' },
                   (data, callback) => {
                     // Loop over favicon's response HTML <link> tags
                     Object.keys(response.html).map((i) => {
@@ -92,7 +91,7 @@ class WebpackFavicons {
                         attributes[key] = value;
 
                         if (
-                          key === 'href' 
+                          key === 'href'
                           && compiler.options.output.publicPath !== 'auto'
                         ) {
                           attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
@@ -123,7 +122,7 @@ class WebpackFavicons {
                 if (compiler.options.output.publicPath !== 'auto') {
                   response.html = Object.keys(response.html).map(
                     (i) => response.html[i].replace(
-                      /href="(.*?)"/g, 
+                      /href="(.*?)"/g,
                       (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
                     )
                   );
@@ -131,16 +130,16 @@ class WebpackFavicons {
 
                 // Inject favicon <link> into .html document(s)
                 let HTML = compilation.getAsset(i).source.source().toString();
-                compilation.updateAsset(                
+                compilation.updateAsset(
                   i,
                   new sources.RawSource(
                     HTML.replace(
-                      /<head>([\s\S]*?)<\/head>/, 
+                      /<head>([\s\S]*?)<\/head>/,
                       `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
                     )
                   )
                 );
-              });         
+              });
 
               // Adds generated images to build
               if (response.images) {
@@ -161,15 +160,19 @@ class WebpackFavicons {
                     source: () => file.contents,
                     size: () => file.contents.length
                   };
-                }); 
+                });
               }
 
-              return assets;                      
+              return assets;
+            },
+            error => {
+              console.error(error.message);
+              return;
             }
           ))
-        );      
+        );
       });
-    }     
+    }
   }
 }
 
