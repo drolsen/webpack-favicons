@@ -3,6 +3,7 @@ const path = require('path');
 const { sources } = require('webpack');
 
 const getAttributes = (markup) => markup.match(/([^\r\n\t\f\v= '"]+)(?:=(["'])?((?:.(?!\2?\s+(?:\S+)=|\2))+.)\2?)?/g).slice(1, -1);
+const getTagType = (markup) => { if (markup.indexOf('meta') !== -1) { return 'meta'; } return 'link'; };
 
 class WebpackFavicons {
   constructor(options, callback) {
@@ -61,112 +62,117 @@ class WebpackFavicons {
             stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL, // see below for more stages  
             additionalAssets: false 
           },
-          (assets) => import('favicons').then((module) => module.favicons(
-            this.options.src,
-            this.options, 
-            (error, response) => {
-              // If we have parsing error lets stop
-              if (error) { console.error(error.message); return; }
-
-              // Check/Run plugin callback
-              if (typeof this.callback === 'function') {
-                response = Object.assign({ ...response }, this.callback(response));
-              }
-
-              //////// if HtmlWebpackPlugin found //////////
-              try {
-                require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
-                  { name: 'WebpackFavicons' }, 
-                  (data, callback) => {
-                    // Loop over favicon's response HTML <link> tags
-                    Object.keys(response.html).map((i) => {
-                      // Collect <link> HTML attributes into key|value object
-                      let attrs = getAttributes(response.html[i]);
-                      const attributes = {};
-
-                      Object.keys(attrs).map((j) => {
-                        const parts = attrs[j].split('=');
-                        const key = parts[0];
-                        const value = parts[1].slice(1, -1);
-
-                        attributes[key] = value;
-
-                        if (
-                          key === 'href' 
-                          && compiler.options.output.publicPath !== 'auto'
-                        ) {
-                          attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
-                        }
-                      });
-
-                      // Push <link> HTML object data into HtmlWebpackPlugin meta template
-                      data.assetTags.meta.push({
-                        tagName: 'link',
-                        voidTag: true,
-                        meta: { plugin: 'WebpackFavicons' },
-                        attributes
-                      });
-                    });
-
-                    // Run required callback with altered data
-                    callback(null, data);
-                  }
-                );
-              } catch (err) { }
-
-              //////// if CopyWebpackPlugin found //////////
-              Object.keys(assets).map((i) => {
-                // Only alter .html files
-                if (i.indexOf('.html') === -1) { return false; }
-
-                // Prepend output.plublicPath to favicon href paths by hand
-                if (compiler.options.output.publicPath !== 'auto') {
-                  response.html = Object.keys(response.html).map(
-                    (i) => response.html[i].replace(
-                      /href="(.*?)"/g, 
-                      (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
-                    )
-                  );
+          (assets) => import('favicons').then(
+            (module) => module.favicons(this.options.src, this.options).then(
+              (response) => {
+                // Check/Run plugin callback
+                if (typeof this.callback === 'function') {
+                  response = Object.assign({ ...response }, this.callback(response));
                 }
 
-                // Inject favicon <link> into .html document(s)
-                let HTML = compilation.getAsset(i).source.source().toString();
-                compilation.updateAsset(                
-                  i,
-                  new sources.RawSource(
-                    HTML.replace(
-                      /<head>([\s\S]*?)<\/head>/, 
-                      `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
+                //////// if HtmlWebpackPlugin found //////////
+                try {
+                  require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
+                    { name: 'WebpackFavicons' }, 
+                    (data, callback) => {
+                      // Loop over favicon's response HTML <link> tags
+                      Object.keys(response.html).map((i) => {
+                        // Collect <link> HTML attributes into key|value object
+
+                        let attrs = getAttributes(response.html[i]);
+                        let type = getTagType(response.html[i]);
+
+                        const attributes = {};
+
+                        Object.keys(attrs).map((j) => {
+                          const parts = attrs[j].split('=');
+                          const key = parts[0];
+                          const value = parts[1].slice(1, -1);
+
+                          attributes[key] = value;
+
+                          if (
+                            key === 'href' 
+                            && compiler.options.output.publicPath !== 'auto'
+                          ) {
+                            attributes[key] = path.normalize(`${compiler.options.output.publicPath}/${value}`).replace(/\\/g, '/');
+                          }
+                        });
+
+                        // Push <link> HTML object data into HtmlWebpackPlugin meta template
+                        data.assetTags.meta.push({
+                          tagName: type,
+                          voidTag: true,
+                          meta: { plugin: 'WebpackFavicons' },
+                          attributes
+                        });
+                      });
+
+                      // Run required callback with altered data
+                      callback(null, data);
+                    }
+                  );
+                } catch (err) { console.error(err); }
+
+                //////// if CopyWebpackPlugin found //////////
+                Object.keys(assets).map((i) => {
+                  // Only alter .html files
+                  if (i.indexOf('.html') === -1) { return false; }
+
+                  // Prepend output.plublicPath to favicon href paths by hand
+                  if (compiler.options.output.publicPath !== 'auto') {
+                    response.html = Object.keys(response.html).map(
+                      (i) => response.html[i].replace(
+                        /href="(.*?)"/g, 
+                        (match, p1, string) => `href="${path.normalize(`${compiler.options.output.publicPath}/${p1}`)}"`.replace(/\\/g, '/')
+                      )
+                    );
+                  }
+
+                  // Inject favicon <link> into .html document(s)
+                  let HTML = compilation.getAsset(i).source.source().toString();
+                  compilation.updateAsset(                
+                    i,
+                    new sources.RawSource(
+                      HTML.replace(
+                        /<head>([\s\S]*?)<\/head>/, 
+                        `<head>$1\r    ${response.html.join('\r    ')}\r  </head>`
+                      )
                     )
-                  )
-                );
-              });         
+                  );
+                });         
 
-              // Adds generated images to build
-              if (response.images) {
-                Object.keys(response.images).map((i) => {
-                  let image = response.images[i];
-                  assets[path.normalize(`/${this.options.path}/${image.name}`)] = {
-                    source: () => image.contents,
-                    size: () => image.contents.length
-                  };
-                });
+                // Adds generated images to build
+                if (response.images) {
+                  Object.keys(response.images).map((i) => {
+                    let image = response.images[i];
+                    assets[path.normalize(`/${this.options.path}/${image.name}`)] = {
+                      source: () => image.contents,
+                      size: () => image.contents.length
+                    };
+                  });
+                }
+
+                // Adds manifest json and xml files to build
+                if (response.files) {
+                  Object.keys(response.files).map((i) => {
+                    let file = response.files[i];
+                    assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
+                      source: () => file.contents,
+                      size: () => file.contents.length
+                    };
+                  }); 
+                }
+
+                return assets;                      
+              },
+              (error) => {
+                // If we have parsing error lets stop
+                console.error(error.message);
+                return;
               }
-
-              // Adds manifest json and xml files to build
-              if (response.files) {
-                Object.keys(response.files).map((i) => {
-                  let file = response.files[i];
-                  assets[path.normalize(`/${this.options.path}/${file.name}`)] = {
-                    source: () => file.contents,
-                    size: () => file.contents.length
-                  };
-                }); 
-              }
-
-              return assets;                      
-            }
-          ))
+            )
+          )
         );      
       });
     }     
