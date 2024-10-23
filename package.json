@@ -30,7 +30,7 @@
     "ava-test": "ava ./test/ava.test.js"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.17.0"
   },
   "devDependencies": {
     "ava": "4.0.1",
