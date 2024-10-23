@@ -72,7 +72,7 @@ class WebpackFavicons {
 
                 //////// if HtmlWebpackPlugin found //////////
                 try {
-                  require('html-webpack-plugin/lib/hooks').getHtmlWebpackPluginHooks(compilation).alterAssetTags.tapAsync(
+                  require('html-webpack-plugin').getCompilationHooks(compilation).alterAssetTags.tapAsync(
                     { name: 'WebpackFavicons' }, 
                     (data, callback) => {
                       // Loop over favicon's response HTML <link> tags
