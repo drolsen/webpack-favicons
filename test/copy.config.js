@@ -7,6 +7,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
     path: path.resolve(__dirname, '../dist/copy'), 
+    publicPath: '/~media/',    
     filename: 'test.js',
     pathinfo: false
   },
@@ -23,13 +24,19 @@ module.exports = {
       }
     }]
   },
+  devtool: false,
   optimization: {
     minimize: false
   },
+  stats: 'none',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '../node_modules/.cache/WebpackFavicons/copy'),
+    buildDependencies: {
+      config: [__filename] // Invalidate cache if config changes
+    },
+  },    
   plugins: [
-    new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/copy/')]
-    }),
     new CopyPlugin({
       patterns: [
         { from: 'test/test.html', to: './' }

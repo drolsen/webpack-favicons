@@ -24,15 +24,21 @@ module.exports = {
       }
     }]
   },
+  devtool: false,
   optimization: {
     minimize: false
   },
+  stats: 'none',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '../node_modules/.cache/WebpackFavicons/publicPath'),
+    buildDependencies: {
+      config: [__filename] // Invalidate cache if config changes
+    },
+  },    
   plugins: [
-    new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/public')]
-    }),
     new HtmlWebpackPlugin({
-      'title': 'Basic Test',
+      'title': 'Public Path Test',
       'template': './test/test.html',
       'filename': './test.html',
       'minify': false
