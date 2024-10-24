@@ -8,6 +8,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'test.js'),
   output: {
     path: path.resolve(__dirname, '../dist/hybrid'), 
+    publicPath: '/~media/',
     filename: 'test.js',
     pathinfo: false
   },
@@ -24,13 +25,19 @@ module.exports = {
       }
     }]
   },
+  devtool: false,
   optimization: {
     minimize: false
   },
+  stats: 'none',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '../node_modules/.cache/WebpackFavicons/hybridcopy'),
+    buildDependencies: {
+      config: [__filename] // Invalidate cache if config changes
+    },
+  },    
   plugins: [
-    new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve('./dist/hybrid/')]
-    }),
     new CopyPlugin({
       patterns: [
         { from: 'test/test.html', to: './' }

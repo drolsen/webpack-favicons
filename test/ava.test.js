@@ -80,6 +80,9 @@ test('minimal-test (no WebpackFavicons "icon": {} configuration)', t => {
 test('full-test (builds lots of favicon types)', t => {
   let fullTest = true;
 
+  const webmanifestTestData = fs.readFileSync(path.resolve(__dirname, '../dist/full/assets/manifest.webmanifest'), 'utf8');
+  const yandexBrowserManifestTestData = fs.readFileSync(path.resolve(__dirname, '../dist/full/assets/yandex-browser-manifest.json'), 'utf8');
+
   if (!fs.existsSync(path.resolve(__dirname, '../dist/full/assets/android-chrome-144x144.png'))){
     fullTest = false;
   }
@@ -118,7 +121,32 @@ test('full-test (builds lots of favicon types)', t => {
 
   if (!fs.existsSync(path.resolve(__dirname, '../dist/full/assets/yandex-browser-50x50.png'))){
     fullTest = false;
-  }                 
+  } 
+
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/full/assets/browserconfig.xml'))){
+    fullTest = false;
+  } 
+
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/full/assets/manifest.webmanifest'))){
+    fullTest = false;
+  } 
+
+  if (!fs.existsSync(path.resolve(__dirname, '../dist/full/assets/yandex-browser-manifest.json'))){
+    fullTest = false;
+  }   
+
+  if (
+    webmanifestTestData.toString().indexOf('"background_color": "#fff"') === -1
+    || webmanifestTestData.toString().indexOf('"theme_color": "#fff"') === -1
+    || webmanifestTestData.toString().indexOf('"name": "Webpack Favicons"') === -1
+    || webmanifestTestData.toString().indexOf('"description": "Favicon Generator for Webpack 5",') === -1
+  ) {
+    fullTest = false;
+  }
+
+  if (yandexBrowserManifestTestData.toString().indexOf('"color": "#fff"') === -1) {
+    fullTest = false;
+  }
 
   if (fullTest) {
     t.pass();

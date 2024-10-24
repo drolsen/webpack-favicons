@@ -24,24 +24,32 @@ module.exports = {
       }
     }]
   },
+  devtool: false,
   optimization: {
     minimize: false
   },
+  stats: 'none',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '../node_modules/.cache/WebpackFavicons/full'),
+    buildDependencies: {
+      config: [__filename] // Invalidate cache if config changes
+    },
+  },   
   plugins: [
-    new CleanWebpackPlugin({
-      'cleanOnceBeforeBuildPatterns': [path.resolve(__dirname, '../dist/full')]
-    }),
     new HtmlWebpackPlugin({
-      'title': 'Basic Test',
+      'title': 'Full Test',
       'template': './test/test.html',
       'filename': './test.html',
       'minify': false
     }),
     new WebpackFavicons({
+      'appName': 'Webpack Favicons',
+      'appDescription': 'Favicon Generator for Webpack 5',
       'src': 'assets/favicon.svg',
       'path': 'assets',
-      'background': '#000',
-      'theme_color': '#000',
+      'background': '#fff',
+      'theme_color': '#fff',
       'icons': {
         'android': true,
         'appleIcon': true,
