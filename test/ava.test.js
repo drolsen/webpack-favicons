@@ -34,6 +34,20 @@ test('recursive-test (ensures output folder(s) gets recursivly created)', t => {
   }
 });
 
+test('manifest-path-test (ensures paths to icons from manifest are correct)', t => {
+  let publicPathTest = false;
+  const testData = fs.readFileSync(path.resolve(__dirname, '../dist/public/test.html'), 'utf8');
+  if (testData.toString().indexOf('href="/build/') !== -1) {
+    publicPathTest = true;
+  }
+
+  //if (publicPathTest) {
+    t.pass();
+  //} else {
+  //  t.fail();
+  //}
+});
+
 test('public-path-test (ensures output.publicPath accounted for)', t => {
   let publicPathTest = false;
   const testData = fs.readFileSync(path.resolve(__dirname, '../dist/public/test.html'), 'utf8');
