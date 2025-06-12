@@ -7,6 +7,51 @@ const getAttributes = (markup) =>
 
 const getTagType = (markup) => (markup.includes('meta') ? 'meta' : 'link');
 
+const applyPathPattern = (pattern, file) => {
+  return pattern.replace('[filename]', file.name);
+};
+
+const fixManifestIconSrc = (pattern, file) => {
+  try {
+    const manifest = JSON.parse(file.contents);
+    if (manifest.icons) {
+      manifest.icons = manifest.icons.map(icon => ({
+        ...icon,
+        src: pattern.replace('[filename]', path.basename(icon.src)) // keep only filename
+      }));
+    }
+    file.contents = JSON.stringify(manifest, null, 2);
+  } catch (err) {
+    console.error(err);
+  }
+
+  return file;
+};
+
+const fixBrowserconfigSrc = (pattern, file) => {
+  try {
+    file.contents = file.contents.replace(/src="([^"]+)"/g, (match, src) => {
+      return `src="${pattern.replace('[filename]', path.basename(src))}"`;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  return file;
+};
+
+const fixYandexManifestIconSrc = (pattern, file) => {
+  try {
+    const manifest = JSON.parse(file.contents);
+    manifest.layout.logo = pattern.replace('[filename]', path.basename(manifest.layout.logo)) // keep only filename
+    file.contents = JSON.stringify(manifest, null, 2);
+  } catch (err) {
+    console.error(err);
+  }
+
+  return file;
+};
+
 class WebpackFavicons {
   constructor(options, callback) {
     // Setting default options, user options will override
@@ -32,6 +77,9 @@ class WebpackFavicons {
       pixel_art: false,                         // Keeps pixels "sharp" when scaling up, for pixel art. Only supported in offline mode.
       loadManifestWithCredentials: false,       // Browsers don't send cookies when fetching a manifest, enable this to fix that. `boolean`
       icons: { favicons: true },                // Specify which icons to generate
+      manifestPathPattern: '[filename]',        // Manifest file's icon path pattern (default is relative)
+      browserconfigPathPattern: '[filename]',   // Browserconfig file'ss icon path pattern (default is relative)
+      yandexManifestIconPattern: '[filename]',   // Yandex Manifest file's icon path pattern (default is relative)
       ...options,
     };
 
@@ -76,6 +124,28 @@ class WebpackFavicons {
               // Check/Run plugin callback
               if (typeof this.callback === 'function') {
                 response = { ...response, ...this.callback(response) };
+              }
+
+              if (
+                (this.options.manifestPathPattern || this.options.browserconfigPathPattern) 
+                && response.files
+              ) {
+                response.files.forEach(file => {
+                  // favicons npm module does not write paths correctly to manifest file, this is their own issue but we can fix it.
+                  if (file.name === 'manifest.webmanifest') {
+                    file = fixManifestIconSrc(this.options.manifestPathPattern, file);
+                  }
+
+                  // favicons npm module does not write paths correctly to browserconfig file, this is their own issue but we can fix it.
+                  if (file.name === 'browserconfig.xml') {
+                    file = fixBrowserconfigSrc(this.options.browserconfigPathPattern, file);
+                  }
+
+                  // favicons npm module does not write paths correctly to yandex file, this is their own issue but we can fix it.
+                  if (file.name === 'yandex-browser-manifest.json') {
+                    file = fixYandexManifestIconSrc(this.options.yandexManifestIconPattern, file);
+                  }                  
+                });
               }
 
               // Inject generated favicon tags into HTML files

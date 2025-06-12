@@ -154,6 +154,76 @@ module.exports = {
 
 ---
 
+### Manifest File
+
+Depending on the options.icons you set for your configuration, you may see a manifest browserconfig or yandexManifest file(s) along with the built icons. 
+
+By default all three file's favicon paths are relative, and will need no altering for most situations. 
+However if you have a need to alter the paths (for whatever reason), you can use the following three path pattern options to do so:
+
+Option | Type | Description
+--- | --- | ---
+`manifestPathPattern` | String | Defines a custom path for this file's icon path. Default is `[filename]` which makes relative paths.
+`browserconfigPathPattern` | String | Defines a custom path for this file's icon path. Default is `[filename]` which makes relative paths.
+`yandexManifestIconPattern` | String | Defines a custom path for this file's icon path. Default is `[filename]` which makes relative paths.
+
+```js
+
+// Basic configuration
+
+module.exports = {
+  output: {
+    path: '/dist', 
+    publicPath: '/~media/'
+  }  
+  plugins: [
+    new WebpackFavicons({
+      src: 'assets/favicon.svg',
+      path: 'img',
+      ...
+      icons: {
+        ...
+      },
+      manifesstPathPattern: '/custom/path/[filename]',
+      browserconfigPathPattern: '/custom/path/[filename]',
+      yandexManifestIconPattern: '/custom/path/[filename]'
+    })
+  ]
+};
+```
+
+#### manifest.webmanifest
+```json
+{
+  "src": "/custom/path/android-chrome-36x36.png",
+  "sizes": "36x36",
+  "type": "image/png",
+  "purpose": "any"
+}
+```
+
+#### yandex-browser-manifest.json
+```json
+"layout": {
+  "logo": "/custom/path/yandex-browser-50x50.png",
+  "color": "#fff",
+  "show_title": true
+}
+```
+
+#### browserconfig.xml
+```xml
+<tile>
+  <square70x70logo src="/custsom/path/mstile-70x70.png"/>
+  <square150x150logo src="/custsom/path/mstile-150x150.png"/>
+  <wide310x150logo src="/custsom/path/mstile-310x150.png"/>
+  <square310x310logo src="/custsom/path/mstile-310x310.png"/>
+  <TileColor>#fff</TileColor>
+</tile>
+```
+
+(Please note these options are custom to this plugin are not part of the itgalaxy/favicons module.)
+
 ### Tests
 
 Webpack Favicons comes with a few `test`s.

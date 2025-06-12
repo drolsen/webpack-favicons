@@ -34,6 +34,81 @@ test('recursive-test (ensures output folder(s) gets recursivly created)', t => {
   }
 });
 
+test('manifest-path-test (ensures paths to icons from manifest are correct)', t => {
+  let testAPassed = false;
+  let testBPassed = false;
+  let testCPassed = false;
+  let testDPassed = false;
+  let testEPassed = false;
+
+  const testADataFile2 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsA/browserconfig.xml'), 'utf8');
+  const testADataFile1 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsA/manifest.webmanifest'), 'utf8');
+  const testADataFile3 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsA/yandex-browser-manifest.json'), 'utf8');
+  
+  const testBDataFile2 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsB/browserconfig.xml'), 'utf8');
+  const testBDataFile1 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsB/manifest.webmanifest'), 'utf8');
+  const testBDataFile3 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsB/yandex-browser-manifest.json'), 'utf8');
+  
+  const testCDataFile2 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsC/browserconfig.xml'), 'utf8');
+  const testCDataFile1 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsC/manifest.webmanifest'), 'utf8');
+  const testCDataFile3 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsC/yandex-browser-manifest.json'), 'utf8');
+  
+  const testDDataFile2 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsD/browserconfig.xml'), 'utf8');
+  const testDDataFile1 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsD/manifest.webmanifest'), 'utf8');
+  const testDDataFile3 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsD/yandex-browser-manifest.json'), 'utf8');
+  
+  const testEDataFile2 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsE/browserconfig.xml'), 'utf8');
+  const testEDataFile1 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsE/manifest.webmanifest'), 'utf8');
+  const testEDataFile3 = fs.readFileSync(path.resolve(__dirname, '../dist/manifest/build/faviconsE/yandex-browser-manifest.json'), 'utf8');
+  
+
+  if (
+    testADataFile1.toString().indexOf('/some/crazy/path/') === -1
+    && testADataFile2.toString().indexOf('/some/crazy/path/') === -1
+    && testADataFile3.toString().indexOf('/some/crazy/path/') === -1
+  ) {
+    testAPassed = true;
+  }
+
+  if (
+    testBDataFile1.toString().indexOf('/some/crazy/path/') !== -1
+    && testBDataFile2.toString().indexOf('/some/crazy/path/') === -1
+    && testBDataFile3.toString().indexOf('/some/crazy/path/') === -1
+  ) {
+    testBPassed = true;
+  }
+
+  if (
+    testCDataFile1.toString().indexOf('/some/crazy/path/') === -1
+    && testCDataFile2.toString().indexOf('/some/crazy/path/') !== -1
+    && testCDataFile3.toString().indexOf('/some/crazy/path/') === -1
+  ) {
+    testCPassed = true;
+  }
+
+  if (
+    testDDataFile1.toString().indexOf('/some/crazy/path/') === -1
+    && testDDataFile2.toString().indexOf('/some/crazy/path/') === -1
+    && testDDataFile3.toString().indexOf('/some/crazy/path/') !== -1
+  ) {
+    testDPassed = true;
+  }
+
+  if (
+    testEDataFile1.toString().indexOf('/some/crazy/path/') !== -1
+    && testEDataFile2.toString().indexOf('/some/crazy/path/') !== -1
+    && testEDataFile3.toString().indexOf('/some/crazy/path/') !== -1
+  ) {
+    testEPassed = true;
+  }
+
+  if (testAPassed && testBPassed && testCPassed && testDPassed && testEPassed) {
+    t.pass();
+  } else {
+    t.fail();
+  }
+});
+
 test('public-path-test (ensures output.publicPath accounted for)', t => {
   let publicPathTest = false;
   const testData = fs.readFileSync(path.resolve(__dirname, '../dist/public/test.html'), 'utf8');
