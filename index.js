@@ -22,24 +22,35 @@ const fixManifestIconSrc = (pattern, file) => {
     }
     file.contents = JSON.stringify(manifest, null, 2);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 
   return file;
 };
 
 const fixBrowserconfigSrc = (pattern, file) => {
-  // Only process if XML, simple regex replace to drop path from src attribute
   try {
     file.contents = file.contents.replace(/src="([^"]+)"/g, (match, src) => {
       return `src="${pattern.replace('[filename]', path.basename(src))}"`;
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 
   return file;
-}
+};
+
+const fixYandexManifestIconSrc = (pattern, file) => {
+  try {
+    const manifest = JSON.parse(file.contents);
+    manifest.layout.logo = pattern.replace('[filename]', path.basename(manifest.layout.logo)) // keep only filename
+    file.contents = JSON.stringify(manifest, null, 2);
+  } catch (err) {
+    console.error(err);
+  }
+
+  return file;
+};
 
 class WebpackFavicons {
   constructor(options, callback) {
@@ -68,6 +79,7 @@ class WebpackFavicons {
       icons: { favicons: true },                // Specify which icons to generate
       manifestPathPattern: '[filename]',        // Manifest file's icon path pattern (default is relative)
       browserconfigPathPattern: '[filename]',   // Browserconfig file'ss icon path pattern (default is relative)
+      yandexManifestIconPattern: '[filename]',   // Yandex Manifest file's icon path pattern (default is relative)
       ...options,
     };
 
@@ -128,6 +140,11 @@ class WebpackFavicons {
                   if (file.name === 'browserconfig.xml') {
                     file = fixBrowserconfigSrc(this.options.browserconfigPathPattern, file);
                   }
+
+                  // favicons npm module does not write paths correctly to yandex file, this is their own issue but we can fix it.
+                  if (file.name === 'yandex-browser-manifest.json') {
+                    file = fixYandexManifestIconSrc(this.options.yandexManifestIconPattern, file);
+                  }                  
                 });
               }
 

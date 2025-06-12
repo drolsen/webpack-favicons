@@ -53,7 +53,10 @@ module.exports = {
       theme_color: '#fff',
       icons: {
         android: true,
+        appleIcon: true,
+        appleStartup: true,
         favicons: true,
+        yandex: true,
         windows: true
       }
     }),
@@ -68,7 +71,10 @@ module.exports = {
       manifestPathPattern: '/some/crazy/path/[filename]',
       icons: {
         android: true,
+        appleIcon: true,
+        appleStartup: true,
         favicons: true,
+        yandex: true,
         windows: true
       }
     }),
@@ -83,11 +89,14 @@ module.exports = {
       browserconfigPathPattern: '/some/crazy/path/[filename]',
       icons: {
         android: true,
+        appleIcon: true,
+        appleStartup: true,
         favicons: true,
+        yandex: true,
         windows: true
       }
     }),
-    /* Both manifest and browser config pathing */
+    /* Yanderx Manifest only pathing */
     new WebpackFavicons({
       appName: 'Webpack Favicons',
       appDescription: 'Webpack Favicons for Webpack 5',
@@ -95,14 +104,36 @@ module.exports = {
       path: 'faviconsD',
       background: '#fff',
       theme_color: '#fff',
-      manifestPathPattern: '/some/crazy/path/[filename]',
-      browserconfigPathPattern: '/some/crazy/path/[filename]',
+      yandexManifestIconPattern: '/some/crazy/path/[filename]',
       icons: {
         android: true,
+        appleIcon: true,
+        appleStartup: true,
         favicons: true,
+        yandex: true,
         windows: true
       }
-    }) 
+    }),
+    /* All manifest and config pathing */
+    new WebpackFavicons({
+      appName: 'Webpack Favicons',
+      appDescription: 'Webpack Favicons for Webpack 5',
+      src: 'assets/favicon.svg',
+      path: 'faviconsE',
+      background: '#fff',
+      theme_color: '#fff',
+      manifestPathPattern: '/some/crazy/path/[filename]',
+      browserconfigPathPattern: '/some/crazy/path/[filename]',
+      yandexManifestIconPattern: '/some/crazy/path/[filename]',
+      icons: {
+        android: true,
+        appleIcon: true,
+        appleStartup: true,
+        favicons: true,
+        yandex: true,
+        windows: true
+      }
+    })  
   ]
 };
 
