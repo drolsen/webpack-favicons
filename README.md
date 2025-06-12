@@ -159,7 +159,7 @@ module.exports = {
 Depending on the options.icons you set for your configuration, you may see a manifest browserconfig or yandexManifest file(s) along with the built icons. 
 
 By default all three file's favicon paths are relative, and will need no altering for most situations. 
-However if you have a need to alter the paths for whatever reasson, you can use the following three path pattern option:
+However if you have a need to alter the paths (for whatever reason), you can use the following three path pattern options to do so:
 
 Option | Type | Description
 --- | --- | ---
